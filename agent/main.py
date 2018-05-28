@@ -4,7 +4,7 @@ import urllib2
 from time import time
 
 network_file = '/proc/net/tcp'
-server = 'http://127.0.0.1'
+server = 'http://127.0.0.1:5000'
 
 ipaddr = socket.gethostbyname(socket.gethostname())
 hostname = socket.gethostname()
@@ -19,17 +19,22 @@ def read_file():
         print(Error)
     else:
         timestamp = str(time())
-        for data in fd:
-            parse_data(timestamp,data)
+        tcp = fd.readlines()
         fd.close()
+        for data in tcp:
+            parse_data(timestamp,data)
+        
 
 def parse_data(timestamp,data):
     value = data.split()
     network = timestamp + ':' + hostname + ':' + ipaddr + ':' +value[1]+':'+value[2]+':'+value[3]
     print(server + "/" + api_version + "/" + context +"/" + network)
-    req = urllib2.Request(server + "/" + api_version + "/" + context +"/" + network)
-    urllib2.urlopen(req)
-    print(network)
+    try:
+        req = urllib2.Request(server + "/" + api_version + "/" + context +"/" + network)
+        connection = urllib2.urlopen(req)
+        connection.close()
+    except:
+        pass
 
 def send_data(data):
     pass
